@@ -29,14 +29,16 @@ ls -1 *.het.pos | xargs -I% echo cat % '|' sed "'s/\./ /' >"%.hetvars >cmds.sh
 rename genome.DP.FORMAT.het.pos. . *.hetvars
 
 #Dump "chr,pos,ref,alt" for these vars. (Used as input in snv.ase.R since the alt allele is seldom biallelic when running mpileup.allelecount.pl below.)
-find $vcdir -maxdepth 1 -name '*.vcf' | grep -v 'allbams' | xargs -I% echo "awk -F'\t' '{print \$1\".\"\$2, \$1, \$2, \$4, \$5;}' % | grep -v '^#' | sort -k 1,1 >"%.pos >cmds.sh
+#find $vcdir -maxdepth 1 -name '*.vcf' | grep -v 'allbams' | xargs -I% echo "awk -F'\t' '{print \$1\".\"\$2, \$1, \$2, \$4, \$5;}' % | grep -v '^#' | sort -k 1,1 >"%.pos >cmds.sh
+find $vcdir -maxdepth 1 -name 'allbams.vcf' | xargs -I% echo "awk -F'\t' '{print \$1\".\"\$2, \$1, \$2, \$4, \$5;}' % | grep -v '^#' | sort -k 1,1 >"%.pos >cmds.sh
 sh cmds.sh
 ls -1 *.het.pos | xargs -I% echo sort % '>'%.sorted >cmds.sh
 sh cmds.sh
 ls -1 *.het.pos.sorted | sed 's/.genome.DP.FORMAT.het.pos.sorted//' >samples.list
-cat samples.list | xargs -I% echo join -j1 %.genome.DP.FORMAT.het.pos.sorted %.genome.DP.FORMAT.het.pos '>' %.hetvars.alleles >cmds.sh
+cat samples.list | xargs -I% echo join -j1 %.genome.DP.FORMAT.het.pos.sorted allbams.vcf.pos '>' %.hetvars.alleles >cmds.sh
 srun -p devel -t 1:00:00 -A b2012046 sh cmds.sh &
 ls -1 *.hetvars.alleles | xargs -I% echo cut -d"' '" -f2-5 % "| tr ' ' '\t' >"%.tmp >cmds.sh
+sh cmds.sh
 rename .hetvars.alleles.tmp .hetvars.alleles *.hetvars.alleles.tmp
 
 
