@@ -42,8 +42,8 @@ main <- function(histfile2id, tab.outfile, hist.pdf.file){
   hist.tabs = read.files(histfile2id)
   dp2frac = get.dp2frac(hist.tabs)
   dp2bases = get.dp2bases(hist.tabs)
-  plot.dp2frac(dp2frac, ltypes = histfile2id[names(dp2frac), 'ltypes'], colors = histfile2id[names(dp2frac), 'colors'])
-  plot.dp2bases(dp2bases)
+  plot.dp2y(dp2frac, ltypes = histfile2id[names(dp2frac), 'ltypes'], colors = histfile2id[names(dp2frac), 'colors'])
+  plot.dp2y(dp2bases)
 
 
   #Plot
@@ -66,11 +66,11 @@ main <- function(histfile2id, tab.outfile, hist.pdf.file){
     par(mfrow = c(1, 2))
     unstim.ind = grep('unstim', names(dp2frac))
     dp2frac.unstim = dp2frac[unstim.ind]
-    plot.dp2frac(dp2frac.unstim, ltypes = histfile2id[names(dp2frac.unstim), 'ltypes'], colors = histfile2id[names(dp2frac.unstim), 'colors'])
+    plot.dp2y(dp2frac.unstim, ltypes = histfile2id[names(dp2frac.unstim), 'ltypes'], colors = histfile2id[names(dp2frac.unstim), 'colors'])
     
     lps.ind = grep('LPS', names(dp2frac))
     dp2frac.lps = dp2frac[lps.ind]
-    plot.dp2frac(dp2frac.lps, ltypes = histfile2id[names(dp2frac.lps), 'ltypes'], colors = histfile2id[names(dp2frac.lps), 'colors'])
+    plot.dp2y(dp2frac.lps, ltypes = histfile2id[names(dp2frac.lps), 'ltypes'], colors = histfile2id[names(dp2frac.lps), 'colors'])
     dev.off()
   }
   
@@ -145,7 +145,7 @@ plot.dp2y <- function(dp2frac, max.plot.dp = 100, ylab = 'fraction covered', lty
   n.hist = length(dp2frac)
   
   ylim = range(unlist(dp2frac))
-  ylim = c(0, 5e8)
+  #ylim = c(0, 5e8)
   jhist = 1
   plot(dp2frac[[jhist]][min.plot.dp:max.plot.dp], xlab = 'depth', ylab = ylab, col=colors[jhist], type = 'l', ylim = ylim, lty = ltypes[jhist])
   for(jhist in 2:n.hist){
