@@ -4,12 +4,13 @@ sys = 'local'
 
 if(sys == 'kalkyl'){
 }
-if(sys == 'local'){  
-  varcalls.datadir = '~/Dropbox/postdoc/projects/ase/data/sim/varcalls'
-  basecount.datadir='~/Dropbox/postdoc/projects/ase/data/sim/basecount'  
-  ase.datadir = '~/Dropbox/postdoc/projects/ase/data/sim/ase'
-  resdir = '~/Dropbox/postdoc/projects/ase/res/sim'
-  annovar.datadir = '~/Dropbox/postdoc/projects/ase/data/sim/annovar'
+if(sys == 'local'){
+  basedir = '~/Dropbox/postdoc/projects/ase_msc_benchmarking/data/gsnap'
+  varcalls.datadir = file.path(basedir, 'varcalls')
+  basecount.datadir = file.path(basedir, 'basecount')
+  annovar.datadir = file.path(basedir, 'annovar')
+  ase.datadir =  file.path(basedir, 'ase')
+  resdir = '~/Dropbox/postdoc/projects/ase_msc_benchmarking/res/gsnap/ase'
 }
 
 #mpileup calls
@@ -66,7 +67,7 @@ main <- function(){
   bc.filt = lapply(bc.filt, function(bc){bc[which(bc[, 'site.dp'] >= min.dp), ]})
 
   #total number of vars
-  length(unique(unlist(lapply(bc.filt, '[[', 'site')))) #112756
+  length(unique(unlist(lapply(bc.filt, '[[', 'site')))) #97628
   
   ###  
   #DP dist
