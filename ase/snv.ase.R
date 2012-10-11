@@ -5,12 +5,13 @@ sys = 'local'
 if(sys == 'kalkyl'){
 }
 if(sys == 'local'){
-  basedir = '~/Dropbox/postdoc/projects/ase_msc_benchmarking/data/gsnap'
+  basedir = '~/Documents/postdoc/ase/asebenchmark/novercontrol/data/gsnap'
   varcalls.datadir = file.path(basedir, 'varcalls')
   basecount.datadir = file.path(basedir, 'basecount')
   annovar.datadir = file.path(basedir, 'annovar')
   ase.datadir =  file.path(basedir, 'ase')
   resdir = '~/Dropbox/postdoc/projects/ase_msc_benchmarking/res/gsnap/ase'
+  dbsnpdir = '~/Documents/postdoc/ase/asebenchmark/novercontrol/data/annot/dbsnp'
 }
 
 #mpileup calls
@@ -22,11 +23,14 @@ vars.regex = '.*hetvars$'
 #basecounts
 bc.regex = '.*basecount$'
 
-#annovar
+#annot
 annovar.file = file.path(annovar.datadir, 'annovar_all_variants.RData')
+dbsnp.file = file.path(dbsnpdir, 'dbsnp.v135.common.pos.txt')
+
 
 #Res
 bc.file = file.path(basecount.datadir, 'bc.RData')
+bc.dbsnp.file = file.path(basecount.datadir, 'bc.dbsnp.RData')
 ase.res.file = file.path(ase.datadir, 'ase.res.RData')
 ase.sample.cond.diff.file = file.path(ase.datadir, 'induced.ase.res.RData')
 induced.ase.sig.file = file.path(ase.datadir, 'induced.ase.sig.RData')
@@ -54,7 +58,7 @@ main <- function(){
 
   #Dump
   save(basecount.list, file = bc.file)
-
+    
   
   ###
   #Filter
@@ -68,6 +72,19 @@ main <- function(){
 
   #total number of vars
   length(unique(unlist(lapply(bc.filt, '[[', 'site')))) #97628
+  
+  #Filter on dbSNP presence
+  dbsnp.vars = read.table(dbsnp.file, stringsAsFactors = FALSE)
+  colnames(dbsnp.vars) = 'site'
+  bc.filt = lapply(bc.filt, function(jsample.vars, dbsnp.vars){merge(jsample.vars, dbsnp.vars, by = 'site')}, dbsnp.vars = dbsnp.vars)
+
+  #total number of vars
+  length(unique(unlist(lapply(bc.filt, '[[', 'site')))) #77969
+
+  #Dump
+  save(bc.filt, file = bc.dbsnp.file)
+
+  
   
   ###  
   #DP dist
