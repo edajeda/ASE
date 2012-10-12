@@ -32,8 +32,7 @@ dbsnp.file = file.path(dbsnpdir, 'dbsnp.v135.common.pos.txt')
 bc.file = file.path(basecount.datadir, 'bc.RData')
 bc.dbsnp.file = file.path(basecount.datadir, 'bc.dbsnp.RData')
 ase.res.file = file.path(ase.datadir, 'ase.res.RData')
-ase.sample.cond.diff.file = file.path(ase.datadir, 'induced.ase.res.RData')
-induced.ase.sig.file = file.path(ase.datadir, 'induced.ase.sig.RData')
+sig.ase.res.file = file.path(resdir, 'sig.ase.res.RData')
 
 main <- function(){
 
@@ -133,7 +132,14 @@ main <- function(){
   
   #Get sig hits
   sig.vars = lapply(ase.res, function(sample.vars, alpha, pval.col){sample.vars = sample.vars[which(sample.vars[, pval.col] <= alpha), ]; return(sample.vars);}, alpha = alpha, pval.col = pval.col)
-  sig.vars.mat = get.sig.mat(ase.res, alpha, pval.col = pval.col)
+
+  #Filter on alternative allele direction
+  alt.vars = lapply(sig.vars, alt.filter)
+  alt.sig.vars = unique(unlist(alt.vars))
+  length(alt.sig.vars) #21092
+  
+  #Dump
+  save(sig.vars, alt.sig.vars, file = sig.ase.res.file)
 
   
   ###
@@ -147,14 +153,7 @@ main <- function(){
   
   #number of uniq sig.vars
   length(unique(unlist(lapply(sig.vars, '[[', 'site')))) #45952
-
-
   
-
-  #((see varstats.R for inspiration, or its enough with the stuff in multiplesnsps2gene.R))
-  #gene annot
-  #DE
-
   
   ###
   #Gene based analysis. 

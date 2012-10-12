@@ -1,71 +1,70 @@
 
 
 sys = 'local'
+
 if(sys == 'kalk'){
 }
 if(sys == 'local'){
   simdir = '~/Dropbox/postdoc/projects/ase/data/sim/synt'
   snpdir = '~/Documents/postdoc/ase/sim/snps'
-  exprdir = file.path(simdir, 'expr')
-  asedir = file.path(simdir, 'ase')
-  number2sample.map.file = file.path(simdir, 'customref2enstcounts.filemapping.tab')
-  snp2count.file = file.path(simdir, 'snps', 'snp2count.RData')
-  snp2count.uniq.file = file.path(simdir, 'snps', 'snp2count.uniq.RData')
-  ase.res.file = file.path(asedir, 'ase.res.RData')
+  ase.method.resdir = '~/Dropbox/postdoc/projects/ase/res/sim'
+  ase.method.datadir = '~/Dropbox/postdoc/projects/ase/data/sim/ase'  
   annovardir = '~/Dropbox/postdoc/projects/ase/data/sim/synt/annovar'
-  #annovar.tab.file = file.path(annovardir, 'synt.snps.tab.variant_function')
-  #annovar.file = file.path(annovardir, 'vars.refgene.annot.RData')
-  annovar.file = file.path(annovardir, 'synt.snps.geneannot.RData')
-  vars.annot.list.file = file.path(asedir, 'ase.res.annot.RData')
-  genes.pass.file = file.path(asedir, 'multisnp.genes.pass.RData')
-  nonuniq.genes.file = file.path(asedir, 'nonuniq.genes.RData')
-  induced.ase.res.file = file.path(asedir, 'induced.ase.res.RData')
-  induced.ase.sig.file = file.path(asedir, 'induced.ase.sig.RData')
 }
 
+exprdir = file.path(simdir, 'expr')
+asedir = file.path(simdir, 'ase')
+
+ase.res.file = file.path(asedir, 'ase.res.RData')
+annovar.file = file.path(annovardir, 'synt.snps.geneannot.RData')
+vars.annot.list.file = file.path(asedir, 'ase.res.annot.RData')
+genes.pass.file = file.path(asedir, 'multisnp.genes.pass.RData')
+nonuniq.genes.file = file.path(asedir, 'nonuniq.genes.RData')
+induced.ase.res.file = file.path(asedir, 'induced.ase.res.RData')
+induced.ase.sig.file = file.path(asedir, 'induced.ase.sig.RData')
+
 main <- function(){  
+
   
   ######
   #1. Condition-INDEPENDENT ASE
   ######
 
-
   ###
   #1.1 Variants
   ###
-  #Without test for sig diff number of treat vs untreat
+
+  #Load "TRUTH"
   ase.noninduced.vars.file = file.path(asedir, 'ase.noninduced.vars.RData')
-  load(ase.noninduced.vars.file) #alt.sig.vars
+  load(ase.noninduced.vars.file) #sig.vars, alt.sig.vars
+  true.sig.vars = unique(unlist(lapply(sig.vars, '[[', 'chrpos')))
   true.alt.sig.vars = alt.sig.vars
-  resdir = '~/Dropbox/postdoc/projects/ase/res/sim'
-  ase.cond.diff.file = file.path(resdir, 'ase.cond.diff.tab')
-  load(ase.cond.diff.file) #alt.sig.vars
-  
-  #get fdr
+
+  #Load significant variants after application of ASE method
+  sig.ase.res.file = file.path(ase.method.resdir, 'sig.ase.res.RData')
+  load(sig.ase.res.file) #sig.vars, alt.sig.vars
+  sig.vars = unique(unlist(lapply(sig.vars, '[[', 'chrpos')))
+
+  #get fdr, alt allele direction filtered: NO
+  fdr = get.fdr(sig.vars, true.sig.vars)
+  print(fdr) #
+
+  #get fdr, alt allele direction filtered: YES
   fdr = get.fdr(alt.sig.vars, true.alt.sig.vars)
   print(fdr) #29%, 6049, 21092  
-
-  #With test for sig diff treat vs untreat
-  ase.noninduced.vars.file = file.path(asedir, 'ase.noninduced.vars.RData')
-  load(ase.noninduced.vars.file)
-  true.sig.alt.ase = sig.alt.ase
-  resdir = '~/Dropbox/postdoc/projects/ase/res/sim'
-  ase.cond.diff.file = file.path(resdir, 'ase.cond.diff.tab')
-  load(ase.cond.diff.file) #sig.alt.ase
-  #get fdr
-  fdr = get.fdr(rownames(sig.alt.ase), rownames(true.sig.alt.ase))
-  print(fdr) #96%, 25, 26
   
   
   ###
   #1.2 Genes
   ###
-  #load data
+  
+  #Load "TRUTH"
   load(genes.pass.file)
   true.genes.pass = genes.pass
   true.gene2nsamples = gene2nsamples
-  run.ase.datadir = '~/Dropbox/postdoc/projects/ase/data/sim/ase'
-  genes.pass.file = file.path(run.ase.datadir, 'multisnp.genes.pass.RData')
+
+  #Load significant variants after application of ASE method
+  genes.pass.file = file.path(ase.method.datadir, 'multisnp.genes.pass.RData')
   load(genes.pass.file) #genes.pass
 
   #get fdr, n.samples = 2
@@ -87,8 +86,7 @@ main <- function(){
   true.genes.pass = genes.pass
   true.sig.vars.nsamples1 = sig.vars.nsamples1
   true.genes.pass.nsamples1 = genes.pass.nsamples1
-  ase.datadir = '~/Dropbox/postdoc/projects/ase/data/sim/ase'
-  induced.ase.sig.file = file.path(ase.datadir, 'induced.ase.sig.RData')
+  induced.ase.sig.file = file.path(ase.method.datadir, 'induced.ase.sig.RData')
   load(induced.ase.sig.file) #sig.vars, genes.pass
 
   ##
