@@ -32,7 +32,7 @@ dbsnp.file = file.path(dbsnpdir, 'dbsnp.v135.common.pos.txt')
 bc.file = file.path(basecount.datadir, 'bc.RData')
 bc.dbsnp.file = file.path(basecount.datadir, 'bc.dbsnp.RData')
 ase.res.file = file.path(ase.datadir, 'ase.res.RData')
-sig.ase.res.file = file.path(resdir, 'sig.ase.res.RData')
+sig.ase.res.file = file.path(ase.datadir, 'sig.ase.res.RData')
 
 main <- function(){
 
@@ -121,7 +121,7 @@ main <- function(){
 
   #Dump
   save(ase.res, file = ase.res.file)
-
+  
   
   ###
   #Sig hits stats
@@ -136,7 +136,7 @@ main <- function(){
   #Filter on alternative allele direction
   alt.vars = lapply(sig.vars, alt.filter)
   alt.sig.vars = unique(unlist(alt.vars))
-  length(alt.sig.vars) #21092
+  length(alt.sig.vars) #17832
   
   #Dump
   save(sig.vars, alt.sig.vars, file = sig.ase.res.file)

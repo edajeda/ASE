@@ -1,12 +1,14 @@
 
-
+sys = 'kalk'
 sys = 'local'
 
 if(sys == 'kalk'){
+  syntdir = '/proj/b2012046/edsgard/ase/sim/data/synt/ase'
+  ase.method.resdir = 'FILLMEIN'
 }
 if(sys == 'local'){
-  syntdir = '/proj/b2012046/edsgard/ase/sim/data/synt/ase'
-  ase.method.resdir = '~/Dropbox/postdoc/projects/ase/res/sim'
+  syntdir = '~/Dropbox/postdoc/projects/ase/data/sim/synt/ase'
+  ase.method.resdir = '~/Documents/postdoc/ase/asebenchmark/novercontrol/data/gsnap/ase'
 }
 
 #Variant-based analysis
@@ -39,15 +41,17 @@ main <- function(){
 
   #Load significant variants after application of ASE method
   load(sig.ase.res.file) #sig.vars, alt.sig.vars
-  sig.vars = unique(unlist(lapply(sig.vars, '[[', 'chrpos')))
-
+  sig.vars = unique(unlist(lapply(sig.vars, rownames)))
+  sig.vars = gsub('^chr', '', sig.vars)
+  alt.sig.vars = gsub('^chr', '', alt.sig.vars)
+  
   #get fdr, alt allele direction filtered: NO
   fdr = get.fdr(sig.vars, true.sig.vars)
-  print(fdr) #tbd
+  print(fdr) #7.4%
 
   #get fdr, alt allele direction filtered: YES
   fdr = get.fdr(alt.sig.vars, true.alt.sig.vars)
-  print(fdr) #29%, 6049, 21092  
+  print(fdr) #6.3%
   
   
   ###
@@ -61,7 +65,7 @@ main <- function(){
 
   #Load significant variants after application of ASE method
   load(method.genes.pass.file) #genes.pass, gene2nsamples
-
+  
   #get fdr, n.samples = 2
   fdr = get.fdr(genes.pass, true.genes.pass)
   print(fdr) #39%, 146, 373
