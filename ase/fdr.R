@@ -5,23 +5,21 @@ sys = 'local'
 if(sys == 'kalk'){
 }
 if(sys == 'local'){
-  simdir = '~/Dropbox/postdoc/projects/ase/data/sim/synt'
-  snpdir = '~/Documents/postdoc/ase/sim/snps'
+  syntdir = '/proj/b2012046/edsgard/ase/sim/data/synt/ase'
   ase.method.resdir = '~/Dropbox/postdoc/projects/ase/res/sim'
-  ase.method.datadir = '~/Dropbox/postdoc/projects/ase/data/sim/ase'  
-  annovardir = '~/Dropbox/postdoc/projects/ase/data/sim/synt/annovar'
 }
 
-exprdir = file.path(simdir, 'expr')
-asedir = file.path(simdir, 'ase')
+#Variant-based analysis
+synt.sig.ase.res.file = file.path(syntdir, 'ase.noninduced.vars.RData')
+sig.ase.res.file = file.path(ase.method.resdir, 'sig.ase.res.RData')
 
-ase.res.file = file.path(asedir, 'ase.res.RData')
-annovar.file = file.path(annovardir, 'synt.snps.geneannot.RData')
-vars.annot.list.file = file.path(asedir, 'ase.res.annot.RData')
-genes.pass.file = file.path(asedir, 'multisnp.genes.pass.RData')
-nonuniq.genes.file = file.path(asedir, 'nonuniq.genes.RData')
-induced.ase.res.file = file.path(asedir, 'induced.ase.res.RData')
-induced.ase.sig.file = file.path(asedir, 'induced.ase.sig.RData')
+#Gene-based analysis
+synt.genes.pass.file = file.path(syntdir, 'multisnp.genes.pass.RData')
+method.genes.pass.file = file.path(ase.method.resdir, 'multisnp.genes.pass.RData')
+
+#Cond-dep ASE
+induced.ase.sig.file = file.path(syntdir, 'induced.ase.sig.RData')
+
 
 main <- function(){  
 
@@ -35,19 +33,17 @@ main <- function(){
   ###
 
   #Load "TRUTH"
-  ase.noninduced.vars.file = file.path(asedir, 'ase.noninduced.vars.RData')
-  load(ase.noninduced.vars.file) #sig.vars, alt.sig.vars
+  load(synt.sig.ase.res.file) #sig.vars, alt.sig.vars
   true.sig.vars = unique(unlist(lapply(sig.vars, '[[', 'chrpos')))
   true.alt.sig.vars = alt.sig.vars
 
   #Load significant variants after application of ASE method
-  sig.ase.res.file = file.path(ase.method.resdir, 'sig.ase.res.RData')
   load(sig.ase.res.file) #sig.vars, alt.sig.vars
   sig.vars = unique(unlist(lapply(sig.vars, '[[', 'chrpos')))
 
   #get fdr, alt allele direction filtered: NO
   fdr = get.fdr(sig.vars, true.sig.vars)
-  print(fdr) #
+  print(fdr) #tbd
 
   #get fdr, alt allele direction filtered: YES
   fdr = get.fdr(alt.sig.vars, true.alt.sig.vars)
@@ -59,13 +55,12 @@ main <- function(){
   ###
   
   #Load "TRUTH"
-  load(genes.pass.file)
+  load(synt.genes.pass.file) #genes.pass, gene2nsamples
   true.genes.pass = genes.pass
   true.gene2nsamples = gene2nsamples
 
   #Load significant variants after application of ASE method
-  genes.pass.file = file.path(ase.method.datadir, 'multisnp.genes.pass.RData')
-  load(genes.pass.file) #genes.pass
+  load(method.genes.pass.file) #genes.pass, gene2nsamples
 
   #get fdr, n.samples = 2
   fdr = get.fdr(genes.pass, true.genes.pass)
@@ -86,7 +81,7 @@ main <- function(){
   true.genes.pass = genes.pass
   true.sig.vars.nsamples1 = sig.vars.nsamples1
   true.genes.pass.nsamples1 = genes.pass.nsamples1
-  induced.ase.sig.file = file.path(ase.method.datadir, 'induced.ase.sig.RData')
+  induced.ase.sig.file = file.path(ase.method.resdir, 'induced.ase.sig.RData')
   load(induced.ase.sig.file) #sig.vars, genes.pass
 
   ##
