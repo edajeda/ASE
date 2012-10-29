@@ -1,4 +1,3 @@
-
 sys = 'kalk'
 sys = 'local'
 
@@ -53,6 +52,9 @@ main <- function(){
   fdr = get.fdr(alt.sig.vars, true.alt.sig.vars)
   print(fdr) #6.3%
   
+  #get sensitivity
+  sens = get.sense(alt.sig.vars, true.alt.sig.vars)
+  print(sens)
   
   ###
   #1.2 Genes
@@ -176,6 +178,17 @@ get.fdr <- function(feat.pass, true.feat.pass){
 
   fdr = c(fdr, n.fp, n.p)
   return(fdr)
+}
+
+get.sens <- function(feat.pass, true.feat.pass){
+  tp = intersect(feat.pass, true.feat.pass)
+  fn = setdiff(true.feat.pass, feat.pass)
+  n.tp = length(tp)
+  n.fn = length(fn)
+  sens = n.tp / (n.tp + n.fn)
+
+  sens = c(sens, n.tp, n.fn)
+  return(sens)
 }
 
 filter.altallele <- function(vars, frac.thr = 0.5, gene.col = 'gene annot', frac.col = 'frac', pval.col = 'mod.padj', min.alt = 1, alpha = 0.05){
